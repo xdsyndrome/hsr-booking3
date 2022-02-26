@@ -14,13 +14,6 @@ for (var i=0; i<25; i++) {
     )
 }
 
-const dummyPassenger = {
-    seatNo: 1, 
-    name: "Dummy",
-    phoneNo: "Dummy",
-    timeStamp: "Dummy",
-}
-
 class PassengerRow extends React.Component {
     render() {
         const passenger = this.props.passenger;
@@ -31,37 +24,6 @@ class PassengerRow extends React.Component {
                 <td className="modalTableCell">{passenger.phoneNo}</td>
                 <td className="modalTableCell">{passenger.timeStamp}</td>
             </tr>
-        );
-    }
-}
-
-class PassengerTable extends React.Component {
-    render() {
-            const passengerRows = this.props.passengers.map(passenger =>
-                <PassengerRow key={passenger.seatNo} passenger={passenger}/>
-        );
-        return (
-            <table className="bordered-table">
-            <thead>
-                <tr>
-                <th>Seat No</th>
-                <th>Name</th>
-                <th>Phone No</th>
-                <th>Time Stamp</th>
-                </tr>
-            </thead>
-            <tbody>
-                {passengerRows}
-            </tbody>
-            </table>            
-        )
-    }
-}
-
-class DisplayHomePage extends React.Component {
-    render() {
-        return(
-            <div>{this.props.displayTitle}</div>
         );
     }
 }
@@ -127,9 +89,7 @@ class DeleteTraveller extends React.Component {
 class DisplayMessage extends React.Component {
     render() {
         return(
-            <table>
-                <thead><tr><th>{this.props.message}</th></tr></thead>
-            </table>
+            <div>{this.props.message}</div>
         );
     }
 }
@@ -228,6 +188,27 @@ class MapCell extends React.Component {
     }
 }
 
+class MenuBar extends React.Component {
+    render() {
+        return(
+            <ul>
+                <li><a onClick={() => this.props.showFunction("home")}>Home</a></li>
+                <li><a onClick={() => this.props.showFunction("AddTravellers")}>Add Travellers</a></li>
+                <li><a onClick={() => this.props.showFunction("DeleteTravellers")}>Delete Travellers</a></li>
+                <li><a onClick={() => this.props.showFunction("DisplayTravellers")}>Display Travellers</a></li>
+            </ul>
+        )
+    }
+}
+
+class Home extends React.Component {
+    render() {
+        return(
+            <div>Click on Navigation Bar for Functions</div>
+        );
+    }
+}
+
 class App extends React.Component {
     constructor() {
         super();
@@ -235,12 +216,14 @@ class App extends React.Component {
             passengers: [],
             show: false,
             count: 0,
-            message: "Welcome"
+            message: "Welcome",
+            display: "home"
             };
         this.createPassenger = this.createPassenger.bind(this);
         this.deletePassenger = this.deletePassenger.bind(this);
-        this.showModal = this.showModal.bind(this)
-        this.hideModal = this.hideModal.bind(this)
+        this.showModal = this.showModal.bind(this);
+        this.hideModal = this.hideModal.bind(this);
+        this.showFunction = this.showFunction.bind(this);
     }
 
     componentDidMount() {
@@ -253,7 +236,8 @@ class App extends React.Component {
                 passengers: db,
                 show: false,
                 count: 0,
-                message: "Welcome"
+                message: "Welcome",
+                display: "home"
                 });
         }, 500); 
     }
@@ -316,7 +300,8 @@ class App extends React.Component {
                 passengers: prevState.passengers,
                 show: true,
                 count: prevState.count,
-                message: prevState.message
+                message: prevState.message,
+                display: prevState.display
             }
         })
     };
@@ -327,25 +312,40 @@ class App extends React.Component {
                 passengers: prevState.passengers,
                 show: false,
                 count: prevState.count,
-                message: prevState.message
+                message: prevState.message,
+                display: prevState.display
             }
         })    
     }
     
+    showFunction(f) {
+        console.log("f",f)
+        console.log(this.state.display)
+        this.setState({ display: f })
+    } 
+
     render() {
+        var display = this.state.display
+        console.log("render", display)
         console.log(this.state)
         return (
             <React.Fragment>
-                <h1>HSR Booking System</h1>
-                <DisplayMessage message={this.state.message}/>
+                <table>
+                    <thead></thead>
+                    <tbody>
+                        <tr><td><h1>HSR Booking System</h1></td></tr>
+                        <tr><td><MenuBar showFunction={this.showFunction} /></td></tr>
+                        <tr><td><DisplayMessage message={this.state.message}/></td></tr>
+                    </tbody>
+                </table>
                 <hr />
-                <AddTraveller createPassenger={this.createPassenger} show={this.state.show} showModal={this.showModal} hideModal={this.hideModal} message={this.state.message}/>
-                <DeleteTraveller deletePassenger={this.deletePassenger} show={this.state.show} showModal={this.showModal} hideModal={this.hideModal} message={this.state.message}/>
-                <hr/>
-                {/*<PassengerTable passengers={this.state.passengers}/>*/}
-                <Dashboard show={this.state.show} showModal={this.showModal} hideModal={this.hideModal} passengers={this.state.passengers}/>
+                {display == "home" && <Home />}
+                {display == "AddTravellers" && <AddTraveller createPassenger={this.createPassenger} show={this.state.show} showModal={this.showModal} hideModal={this.hideModal} message={this.state.message}/>}
+                {display == "DeleteTravellers" && <DeleteTraveller deletePassenger={this.deletePassenger} show={this.state.show} showModal={this.showModal} hideModal={this.hideModal} message={this.state.message}/>}
+                {display == "DisplayTravellers" && <Dashboard show={this.state.show} showModal={this.showModal} hideModal={this.hideModal} passengers={this.state.passengers}/>}
                 <hr />
                 <SeatMap passengers={this.state.passengers}/>
+                
             </React.Fragment>
         )
     }
