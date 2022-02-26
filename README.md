@@ -10,6 +10,7 @@ Skeleton ticket booking website.
 * Clone Repository
 * Run following command to start server
 ```
+npm run build
 npm run dev
 ```
 
